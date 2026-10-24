@@ -1,0 +1,45 @@
+server {
+    listen 80 default_server;
+    server_name _;
+
+    absolute_redirect off;
+
+    root /var/www;
+
+    location / {
+        return 404;
+    }
+
+    location ~ /\. {
+        return 403;
+    }
+
+    # Clients discover CalDAV and CardDAV services through well-known locations.
+    location = /.well-known/caldav {
+        return 301 /baikal/dav.php;
+    }
+
+    location = /.well-known/carddav {
+        return 301 /baikal/dav.php;
+    }
+
+    location = /baikal {
+        return 301 /baikal/;
+    }
+
+    location /baikal/ {
+        index index.php;
+    }
+
+    # cal.php and card.php are deprecated in favor of dav.php, but existing clients might still use them.
+    location ~ ^/baikal/((admin/(install/)?)?index|dav|cal|card)\.php(/|$) {
+        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+        include fastcgi_php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+
+    location ~ \.php(/|$) {
+        return 404;
+    }
+}

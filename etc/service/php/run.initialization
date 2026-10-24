@@ -1,0 +1,5 @@
+# Volumes can be mounted empty and owned by root. Baikal writes its configuration (which contains
+# secrets) and the SQLite database into these directories from the admin interface.
+mkdir -p /var/lib/baikal/config /var/lib/baikal/Specific/db
+chown -R fcgi-php:fcgi-php /var/lib/baikal/config /var/lib/baikal/Specific
+chmod 750 /var/lib/baikal/config /var/lib/baikal/Specific
